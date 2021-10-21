@@ -1,95 +1,131 @@
-package Sudoku;
-
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.Scanner;
+class BackTrack
+{ 
+public static boolean SafetyCheck(int[][] grid,  
+                             int row, int col,  
+                             int num)  
+{ 
+    
+    for (int i = 0; i < grid.length; i++)  
+    {  
+        if (grid[row][i] == num)  
+        { 
+            return false; 
+        } 
+    } 
+      
+    
+    for (int i = 0; i < grid.length; i++) 
+    {   
+        if (grid[i][col] == num) 
+        { 
+            return false; 
+        } 
+    } 
+  
+    
+    int root = (int) Math.sqrt(grid.length); 
+    int Gridrow = row - row % root; 
+    int GridCol = col - col % root; 
+  
+    for (int i = Gridrow;i < Gridrow + root; i++)  
+    { 
+        for (int j = GridCol;j < GridCol + root; j++)  
+        { 
+            if (grid[i][j] == num)  
+            { 
+                return false; 
+            } 
+        } 
+    } 
+  
+    
+    return true; 
+} 
+  
+public static boolean SudokuSolver(int[][] grid, int n)  
+{ 
+    int row = -1; 
+    int col = -1; 
+    boolean empty = true; 
+    for (int i = 0; i < n; i++) 
+    { 
+        for (int j = 0; j < n; j++)  
+        { 
+            if (grid[i][j] == 0)  
+            { 
+                row = i; 
+                col = j; 
+                empty = false;   
+                break; 
+            } 
+        } 
+        if (!empty) 
+        { 
+            break; 
+        } 
+    } 
+   
+    if (empty)  
+    { 
+        return true; 
+    } 
+  
+    
+    for (int k = 1; k <= n; k++) 
+    { 
+        if (SafetyCheck(grid, row, col, k)) 
+        { 
+            grid[row][col] = k; 
+            if (SudokuSolver(grid, n))  
+            { 
+              return true; 
+            }  
+            else
+            { 
+                grid[row][col] = 0;  
+            } 
+        } 
+    } 
+    return false; 
+} 
+  
+public static void print(int[][] grid, int N)     
+{  System.out.println("\n\n\nThe Solution:\n");
 
-/**
- * Created by Jarvis on 9/23/17.
- */
-public class Sudoku
-{
-    public int[][] puz;
-    private int size;
-    private int box_r;
-    private int box_c;
-
-    public Sudoku()
-    {
-        Scanner s = new Scanner(System.in);
-        System.out.print("Enter size of sudoku: ");
-        size = s.nextInt();
-        System.out.print("Enter # rows of inner box: ");
-        box_r = s.nextInt();
-        System.out.print("Enter # columns of inner box: ");
-        box_c = s.nextInt();
-        s.close();
-        puz = new int[size][size];
-    }
-
-    public int length()
-    {
-        return puz.length;
-    }
-
-    public int getBox_r()
-    {
-        return box_r;
-    }
-
-    public int getBox_c()
-    {
-        return box_c;
-    }
-
-    public boolean loadSudoku()
-    {
-        try
-        {
-            Scanner scan = new Scanner(new File("puzzle.txt"));
-
-            if (!scan.hasNextLine())    {System.out.println("Empty File. Exiting..."); return false;}
-
-            for (int i = 0; i < puz.length; i++)
-            {
-                for (int j = 0; j < puz[i].length; j++)
-                {
-                    puz[i][j] = scan.nextInt();
-                }
-            }
-            scan.close();
-        }
-        catch(FileNotFoundException e)
-        {
-            System.out.println("File Not Found. Please create a puzzle.txt in the same folder this app is in. Exiting...");
-        }
-        System.out.println("Sudoku is now loaded.");
-        return true;
-    }
-
-    public void printSudoku()
-    {
-        int r = 0;
-        int c = 0;
-        String repeatedStar = new String(new char[4*puz.length+4]).replace('\0', '-');
-        for (int[] i: puz)
-        {
-            if (r % box_r == 0)
-                System.out.print(repeatedStar+'\n');
-            for(int j: i)
-            {
-                if (c % box_c == 0)
-                    System.out.print('|');
-                if (j < 10)
-                    System.out.print("  " + j + " ");
-                else
-                    System.out.print(" " + j + " ");
-                c++;
-            }
-            r++;
-            System.out.print("|");
-            System.out.println();
-        }
-        System.out.print(repeatedStar+'\n');
-    }
+    for (int i = 0; i < N; i++) 
+    { 
+        for (int j = 0; j < N; j++) 
+        { 
+            System.out.print(grid[i][j]); 
+            System.out.print(" "); 
+        } 
+        System.out.print("\n"); 
+        //for printing spaces to form grid  
+        if ((i + 1) % (int) Math.sqrt(N) == 0)  
+        { 
+            System.out.print(""); 
+        } 
+    } 
+} 
+  
+public static void main(String args[]) 
+{   
+    int[][] grid = new int[9][9];
+    Scanner s=new Scanner(System.in); 
+    for(int i=0;i<9;i++)
+  for(int j=0;j<9;j++)
+    grid[i][j]=s.nextInt();  
+     
+    int length = grid.length; 
+  
+    if (SudokuSolver(grid, length)) 
+    { 
+        print(grid, length); 
+    }  
+    else
+    { 
+        System.out.println("No Solution Exists"); 
+    } 
+} 
 }
